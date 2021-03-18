@@ -2,6 +2,10 @@ package com.restful.api.controller.v1;
 
 import com.restful.api.entity.User;
 import com.restful.api.repository.UserRepository;
+import com.restful.api.response.CommonResult;
+import com.restful.api.response.ListResult;
+import com.restful.api.response.ResponseService;
+import com.restful.api.response.SingleResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,23 +42,58 @@ import java.util.List;
 @RequestMapping(value = "/v1")
 @RestController // 결과값을 JSON으로 출력한다.
 public class UserController {
-    private final UserRepository userRepository;
 
-    @ApiOperation(value = "회원 조회", notes = "모든 회원을 조회한다.")
+    private final UserRepository userRepository;
+    private final ResponseService responseService;
+
+    @ApiOperation(value = "회원 리스트 조회", notes = "모든 회원을 조회한다.")
     @GetMapping(value = "/users")
-    public List<User> findAllUser() {
+    public ListResult<User> findAllUser() {
         System.out.println(userRepository.findAll());
-        return userRepository.findAll();
+
+        return responseService.getListResult(userRepository.findAll());
+    }
+
+    @ApiOperation(value = "회원 단건 조회", notes = "userId로 회원을 조회한다.")
+    @GetMapping(value = "/users/{id}")
+    public SingleResult<User> findById(@ApiParam(value = "회원ID", required = true) @PathVariable Long id) {
+        System.out.println(userRepository.findById(id));
+
+        return responseService.getSingleResult(userRepository.findById(id).orElse(null));
     }
 
     @ApiOperation(value = "회원 등록", notes = "회원을 등록한다.")
     @PostMapping(value = "/users")
-    public User save(@ApiParam(value = "회원아이디", required = true) @RequestParam String uid,
-                     @ApiParam(value = "회원이름", required = true) @RequestParam String username) {
+    public SingleResult<User> save(@ApiParam(value = "회원아이디", required = true) @RequestParam String uid,
+                                  @ApiParam(value = "회원이름", required = true) @RequestParam String username) {
         User user = User.builder()
                 .uid(uid)
                 .username(username)
                 .build();
-        return userRepository.save(user);
+
+        return responseService.getSingleResult(userRepository.save(user));
     }
+
+    @ApiOperation(value = "회원 수정", notes = "userId로 회원정보를 수정한다.")
+    @PutMapping(value = "/users/{id}")
+    public SingleResult<User> update(@ApiParam(value = "회원ID", required = true) @PathVariable Long id,
+                                     @ApiParam(value = "회원아이디", required = true) @RequestParam String uid,
+                                     @ApiParam(value = "회원이름", required = true) @RequestParam String username) {
+        User user = User.builder()
+                .id(id)
+                .uid(uid)
+                .username(username)
+                .build();
+
+        return responseService.getSingleResult(userRepository.save(user));
+    }
+
+    @ApiOperation(value = "회원 삭제", notes = "userId로 회원를 삭제한다.")
+    @DeleteMapping(value = "/users/{id}")
+    public CommonResult delete(@ApiParam(value = "회원ID", required = true) @PathVariable Long id) {
+        userRepository.deleteById(id);
+
+        return responseService.getSuccessResult();
+    }
+
 }
