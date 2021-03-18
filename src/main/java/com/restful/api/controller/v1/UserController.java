@@ -1,5 +1,6 @@
 package com.restful.api.controller.v1;
 
+import com.restful.api.advice.exception.CUserNotFoundException;
 import com.restful.api.entity.User;
 import com.restful.api.repository.UserRepository;
 import com.restful.api.response.CommonResult;
@@ -59,7 +60,7 @@ public class UserController {
     public SingleResult<User> findById(@ApiParam(value = "회원ID", required = true) @PathVariable Long id) {
         System.out.println(userRepository.findById(id));
 
-        return responseService.getSingleResult(userRepository.findById(id).orElse(null));
+        return responseService.getSingleResult(userRepository.findById(id).orElseThrow(CUserNotFoundException::new));
     }
 
     @ApiOperation(value = "회원 등록", notes = "회원을 등록한다.")
