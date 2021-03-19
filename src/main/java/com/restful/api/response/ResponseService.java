@@ -31,11 +31,11 @@ public class ResponseService {
     }
 
     // 실패 결과를 처리하는 메서드
-    public CommonResult getFailResult() {
+    public CommonResult getFailResult(int code, String message) {
         CommonResult result = new CommonResult();
         result.setSuccess(false);
-        result.setCode(CommonResponse.FAIL.getCode());
-        result.setMessage(CommonResponse.FAIL.getMessage());
+        result.setCode(code);
+        result.setMessage(message);
         return result;
     }
 

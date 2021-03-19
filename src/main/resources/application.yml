@@ -8,11 +8,14 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       # create : 서버 시작할 때 모든 테이블을 생성
       # create-drop : 서버 시작할 때 모든 테이블을 생성하고, 종료할 때 생성된 테이블을 삭제
       # update : 서버 시작할 때 Entity와 Table을 비교하여 변경된 내용을 반영
       # validate : 서버 시작할 때 Entity와 Table을 비교하여 다르면 시작하지 않고 종료
       # none : 아무런 처리를 하지 않음
     show-sql: true
+  messages:
+    basename: i18n/exception
+    encoding: UTF-8
 
