@@ -1,8 +1,11 @@
 package com.restful.api.entity;
 
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Builder // 빌더 패턴을 사용한다.
 @Data // @Getter, @Setter, @ToString 등이 들어있다.
@@ -10,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor // 인자를 모두 가진 생성자를 자동으로 생성한다.
 @Table(name = "user") // 'user' 테이블과 매핑됨을 명시
 @Entity // JPA Entity임을 명시한다.
-public class User {
+public class User implements UserDetails {
 
     @Id // Primary Key임을 명시한다.
     /* 기본키 자동생성 전략
@@ -28,4 +31,39 @@ public class User {
     @Column(nullable = false, length = 100)
     private String username;
 
+    /*
+     * 스프링 시큐리티의 보안 적용을 위해서 User 엔티티에 UserDetails 클래스를 구현해 추가 정보를 재정의한다.
+     * roles는 회원이 가지고 있는
+
+     */
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
 }
