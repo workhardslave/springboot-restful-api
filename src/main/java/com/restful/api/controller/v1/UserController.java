@@ -7,10 +7,10 @@ import com.restful.api.response.CommonResult;
 import com.restful.api.response.ListResult;
 import com.restful.api.response.ResponseService;
 import com.restful.api.response.SingleResult;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,9 +36,14 @@ import java.util.List;
  * @ApiParam(value = "", required = "") @RequestParam ~~~
  * 파라미터에 대한 설명을 보여주기 위해 세팅한다.
  *
+ * @ApiImplicitParam(name = "", value = "", required = false, dataType = "", paramType ="")
+ * 파라미터에 대한 자세한 정보를 추가한다.
+ *
  */
 
-@Api(tags = {"1. User"})
+//@Secured("ROLE_USER")
+//@PreAuthorize("hasRole('ADMIN_USER')")
+@Api(tags = {"2. User"})
 @RequiredArgsConstructor
 @RequestMapping(value = "/v1")
 @RestController // 결과값을 JSON으로 출력한다.
@@ -47,6 +52,9 @@ public class UserController {
     private final UserRepository userRepository;
     private final ResponseService responseService;
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access token", required = true, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "회원 리스트 조회", notes = "모든 회원을 조회한다.")
     @GetMapping(value = "/users")
     public ListResult<User> findAllUser() {
@@ -55,6 +63,9 @@ public class UserController {
         return responseService.getListResult(userRepository.findAll());
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "회원 단건 조회", notes = "userId로 회원을 조회한다.")
     @GetMapping(value = "/users/{id}")
     public SingleResult<User> findById(@ApiParam(value = "회원ID", required = true) @PathVariable Long id,
@@ -64,18 +75,9 @@ public class UserController {
         return responseService.getSingleResult(userRepository.findById(id).orElseThrow(CUserNotFoundException::new));
     }
 
-    @ApiOperation(value = "회원 등록", notes = "회원을 등록한다.")
-    @PostMapping(value = "/users")
-    public SingleResult<User> save(@ApiParam(value = "회원아이디", required = true) @RequestParam String uid,
-                                  @ApiParam(value = "회원이름", required = true) @RequestParam String username) {
-        User user = User.builder()
-                .uid(uid)
-                .username(username)
-                .build();
-
-        return responseService.getSingleResult(userRepository.save(user));
-    }
-
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access token", required = true, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "회원 수정", notes = "userId로 회원정보를 수정한다.")
     @PutMapping(value = "/users/{id}")
     public SingleResult<User> update(@ApiParam(value = "회원ID", required = true) @PathVariable Long id,
@@ -90,6 +92,9 @@ public class UserController {
         return responseService.getSingleResult(userRepository.save(user));
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access token", required = true, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "회원 삭제", notes = "userId로 회원를 삭제한다.")
     @DeleteMapping(value = "/users/{id}")
     public CommonResult delete(@ApiParam(value = "회원ID", required = true) @PathVariable Long id) {

@@ -27,6 +27,8 @@ public class ResponseService {
     public CommonResult getSuccessResult() {
         CommonResult result = new CommonResult();
         setSuccessResult(result);
+        System.out.println("result.getCode() = " + result.getCode());
+        System.out.println("result.getMessage() = " + result.getMessage());
         return result;
     }
 
@@ -36,6 +38,8 @@ public class ResponseService {
         result.setSuccess(false);
         result.setCode(code);
         result.setMessage(message);
+        System.out.println("result.getCode() = " + result.getCode());
+        System.out.println("result.getMessage() = " + result.getMessage());
         return result;
     }
 

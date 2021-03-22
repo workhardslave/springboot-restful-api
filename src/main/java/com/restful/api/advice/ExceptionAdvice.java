@@ -1,5 +1,7 @@
 package com.restful.api.advice;
 
+import com.restful.api.advice.exception.CAuthenticationEntryPointException;
+import com.restful.api.advice.exception.CEmailSigninFailedException;
 import com.restful.api.advice.exception.CUserNotFoundException;
 import com.restful.api.response.CommonResult;
 import com.restful.api.response.ResponseService;
@@ -7,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,6 +32,11 @@ import javax.servlet.http.HttpServletRequest;
  * @ResponseStatus
  * 해당 익셉션이 발생하면 response에 출력되는 Http 상태 코드를 설정할 수 있다.
  * 상태 코드는 성공이냐 아니냐 정도의 의미만 있고, 실제 사용하는 성공 실패 여부는 JSON으로 출력되는 정보를 이용한다.
+ *
+ * 커스텀 예외 처리가 적용이 안되는 이유
+ * 필터링의 순서가 원인이다.
+ * ControllerAdvice는 스프링이 처리 가능한 영역까지 요청이 도달해야한다.
+ * 그러나 스프링 시큐리티는 스프링 앞단에서 필터링을 하므로, 해당 상황의 익셉션이 DispatchServlet까지 도달하지 않는다.
  */
 
 @RequiredArgsConstructor
@@ -52,6 +60,25 @@ public class ExceptionAdvice {
         // 예외 처리의 메시지를 MessageSource에서 가져오도록 수정
         return responseService.getFailResult(Integer.valueOf(getMessage("userNotFound.code")), getMessage("userNotFound.message"));
     }
+
+    @ExceptionHandler(CEmailSigninFailedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    protected CommonResult emailSigninFailedException(HttpServletRequest request, CEmailSigninFailedException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("emailSigninFailed.code")), getMessage("emailSigninFailed.message"));
+    }
+
+    @ExceptionHandler(CAuthenticationEntryPointException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    private CommonResult authenticationEntryPointException(HttpServletRequest request, CAuthenticationEntryPointException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("entryPointException.code")), getMessage("entryPointException.message"));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public CommonResult AccessDeniedException(HttpServletRequest request, AccessDeniedException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("accessDenied.code")), getMessage("accessDenied.message"));
+    }
+
 
     // code 정보에 해당하는 메시지를 조회합니다.
     private String getMessage(String code) {
