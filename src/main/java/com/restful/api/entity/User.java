@@ -38,7 +38,7 @@ public class User implements UserDetails {
     private String password;
 
     @Column(nullable = false, length = 100)
-    private String username;
+    private String uname;
 
     /*
      * 스프링 시큐리티의 보안 적용을 위해서 User 엔티티에 UserDetails 클래스를 구현해 추가 정보를 재정의한다.

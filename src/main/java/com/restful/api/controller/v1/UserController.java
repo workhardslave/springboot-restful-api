@@ -82,11 +82,11 @@ public class UserController {
     @PutMapping(value = "/users/{id}")
     public SingleResult<User> update(@ApiParam(value = "회원ID", required = true) @PathVariable Long id,
                                      @ApiParam(value = "회원아이디", required = true) @RequestParam String uid,
-                                     @ApiParam(value = "회원이름", required = true) @RequestParam String username) {
+                                     @ApiParam(value = "회원이름", required = true) @RequestParam String uname) {
         User user = User.builder()
                 .id(id)
                 .uid(uid)
-                .username(username)
+                .uname(uname)
                 .build();
 
         return responseService.getSingleResult(userRepository.save(user));

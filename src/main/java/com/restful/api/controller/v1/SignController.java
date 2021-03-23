@@ -48,12 +48,12 @@ public class SignController {
     @PostMapping(value = "/signup")
     public CommonResult signup(@ApiParam(value = "회원ID : 이메일", required = true) @RequestParam String uid,
                                @ApiParam(value = "비밀번호", required = true) @RequestParam String password,
-                               @ApiParam(value = "이름", required = true) @RequestParam String username)
+                               @ApiParam(value = "이름", required = true) @RequestParam String uname)
     {
         User user = userRepository.save(User.builder()
                 .uid(uid)
                 .password(passwordEncoder.encode(password))
-                .username(username)
+                .uname(uname)
                 .roles(Collections.singletonList("ROLE_USER"))
                 .build());
 
